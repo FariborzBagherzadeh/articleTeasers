@@ -1,24 +1,43 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import "./App.css";
+import ArticleTeasers from "./components/ArticleTeasers/ArticleTeasers";
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [number, setNumber] = useState(0);
+  const [image, setImage] = useState("");
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const resultNumbers = await axios.get(
+        "http://www.randomnumberapi.com/api/v1.0/random",
+        {
+          params: {
+            min: 0,
+            max: 20,
+            count: 1,
+          },
+        }
+      );
+      setNumber(resultNumbers.data[0]);
+      const resultImages = await axios.get(
+        "https://dog.ceo/api/breeds/image/random"
+      );
+      setImage(resultImages.data["message"]);
+      setIsLoading(false);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <ArticleTeasers number={number} image={image} isLoading={isLoading} />
     </div>
   );
 }
